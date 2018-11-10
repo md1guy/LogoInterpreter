@@ -1,7 +1,7 @@
 let Command = require("./command.js")
 
 class Parser {
-
+/* 
     static parse(code, turtle) {
 
         if (typeof(code) !== "string") {
@@ -27,6 +27,7 @@ class Parser {
 
             if (name === 'repeat') {
 
+ 
                 let times = args[0];
                 let call = `repeat ${times} [`;
 
@@ -60,6 +61,17 @@ class Parser {
                 turtle.commands.push(new Command(name, args));
             }
         }
+    } */
+
+    static parse(code) {
+
+        if (typeof (code) !== "string") {
+            // TODO: wrong parameter type exception
+        }
+
+        let formattedCode = Parser.format(code).trim();
+
+        let tokens = formattedCode.split
     }
 
     static format(text) {
@@ -67,8 +79,11 @@ class Parser {
         let newlineRegex = /\r?\n|\r/g;
         let severalWhitespacesRegex = /\s{2,}/g
 
-        text = text.replace(newlineRegex, ' ');
-        text = text.replace(severalWhitespacesRegex, ' ');
+        text = text
+            .replace('[', ' [')
+            .replace(']', '] ')
+            .replace(newlineRegex, ' ')
+            .replace(severalWhitespacesRegex, ' ');
 
         return text;
     }
