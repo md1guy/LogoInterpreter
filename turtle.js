@@ -6,10 +6,17 @@ class Turtle {
         this.y = y;
         this.dir = dir;
         this.penDown = true;
+        this.commands = [];
     }
 
     go(code) {
-        return Parser.parse(code);
+        Parser.parse(code, this);
+        console.log(this.commands);
+        
+    }
+
+    execute(commands) {
+
     }
 }
 
