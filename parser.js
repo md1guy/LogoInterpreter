@@ -6,14 +6,18 @@ class Parser {
         if (typeof(code) !== "string") {
             // wrong parameter type exception
         }
+        
+        
+    }
 
+    static format(text) {
         let newlineRegex = /\r?\n|\r/g;
         let severalWhitespacesRegex = /\s{2,}/g
 
-        code = code.replace(newlineRegex, ' ');
-        code = code.replace(severalWhitespacesRegex, ' ');
+        text = text.replace(newlineRegex, ' ');
+        text = text.replace(severalWhitespacesRegex, ' ');
 
-        return code;
+        return text;
     }
 }
 
