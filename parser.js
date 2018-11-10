@@ -2,12 +2,12 @@ let Command = require("./command.js")
 
 class Parser {
 
-    parse(code) {
+    static parse(code) {
         if (typeof(code) !== "string") {
             // wrong parameter type exception
         }
         
-        
+        return "asfe";
     }
 
     static format(text) {
