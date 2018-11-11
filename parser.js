@@ -1,4 +1,5 @@
 let Command = require("./command.js")
+const util = require('util');
 
 class Parser {
 /* 
@@ -63,15 +64,84 @@ class Parser {
         }
     } */
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     static parse(code) {
 
-        if (typeof (code) !== "string") {
-            // TODO: wrong parameter type exception
+        let formattedCode = this.format(code);
+
+        let commands = [];
+
+        let index = 0;
+
+        let digitRegex = /\d+/;
+
+        let res;
+
+        while(index < formattedCode.length) {
+
+            res = this.getNextTokenAndUpdateIndex(formattedCode, index);
+            
+            let commandName = res.token;
+            index = res.index;
+
+            let commandArgs = [];
+
+            while (digitRegex.test(res = this.getNextTokenAndUpdateIndex(formattedCode, index)).token) {
+                
+                commandArgs.push(res.token);
+                index = res.index;
+            }
+
+            commands.push(new Command(commandName, commandArgs));
         }
 
-        let formattedCode = Parser.format(code).trim();
+        return commands;
+    }
 
-        let tokens = formattedCode.split
+    static getNextTokenAndUpdateIndex(text, index) {
+
+        let token = '';
+
+        while (text.charAt(index) === ' ' && index < text.length) {
+            
+            index++;
+        }
+
+        while (text.charAt(index) !== ' ' && index < text.length) {
+            
+            token += text.charAt(index);
+            index++;
+        }
+
+        return {
+            'token': token,
+            'index': index
+        }
     }
 
     static format(text) {
@@ -80,10 +150,9 @@ class Parser {
         let severalWhitespacesRegex = /\s{2,}/g
 
         text = text
-            .replace('[', ' [')
-            .replace(']', '] ')
             .replace(newlineRegex, ' ')
-            .replace(severalWhitespacesRegex, ' ');
+            .replace(severalWhitespacesRegex, ' ')
+            .trim();
 
         return text;
     }

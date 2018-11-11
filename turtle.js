@@ -1,3 +1,5 @@
+const util = require('util');
+
 let Parser = require('./parser')
 
 class Turtle {
@@ -10,9 +12,8 @@ class Turtle {
     }
 
     go(code) {
-        Parser.parse(code, this);
-        console.log(this.commands);
-        
+        this.commands = Parser.parse(code);
+        console.log(util.inspect(this.commands, false, null, true));
     }
 
     execute(commands) {
