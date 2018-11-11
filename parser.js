@@ -2,93 +2,6 @@ let Command = require("./command.js")
 const util = require('util');
 
 class Parser {
-/* 
-    static parse(code, turtle) {
-
-        if (typeof(code) !== "string") {
-            // TODO: wrong parameter type exception
-        }
-
-        code = Parser.format(code).trim();
-
-        let tokens = code.split(' ');
-
-        let index = 0;
-
-        let digitRegex = /\d+/;
-
-        while(index < tokens.length) {
-
-            let name = tokens[index];
-            let args = [];
-
-            while (digitRegex.test(tokens[++index])) {
-                args.push(tokens[index]);
-            }
-
-            if (name === 'repeat') {
-
- 
-                let times = args[0];
-                let call = `repeat ${times} [`;
-
-                let innerCode = code.slice(code.indexOf(call) + call.length);
-
-                let openedBracketsCount = 1;
-                let carriage = -1;
-
-                while (openedBracketsCount > 0) {
-                    carriage++;
-
-                    if (innerCode[carriage] === '[') openedBracketsCount++;
-                    if (innerCode[carriage] === ']') openedBracketsCount--;
-                }
-
-                let leftInnerCode = innerCode.slice(0, carriage);
-                let rightInnerCode = innerCode.slice(carriage + 1);
-
-                for (let i = 0; i < times; i++) {
-
-                    Parser.parse(leftInnerCode, turtle);
-                }
-
-                if (rightInnerCode.length > 0) Parser.parse(rightInnerCode, turtle);
-
-                return;
-            }
-
-            else {
-                
-                turtle.commands.push(new Command(name, args));
-            }
-        }
-    } */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     static parse(code) {
 
@@ -102,18 +15,29 @@ class Parser {
 
         let res;
 
-        while(index < formattedCode.length) {
+        while (index < formattedCode.length) {
 
             res = this.getNextTokenAndUpdateIndex(formattedCode, index);
-            
+
             let commandName = res.token;
             index = res.index;
 
             let commandArgs = [];
 
-            while (digitRegex.test(res = this.getNextTokenAndUpdateIndex(formattedCode, index)).token) {
-                
+            while (digitRegex.test((res = this.getNextTokenAndUpdateIndex(formattedCode, index)).token)) {
+
                 commandArgs.push(res.token);
+                index = res.index;
+            }
+
+            if (commandName === 'repeat') {
+
+                res = this.getRepeatBody(formattedCode, ++index);
+
+                let parsedBody = this.parse(res.body);
+                
+                commandArgs.push(parsedBody);
+
                 index = res.index;
             }
 
@@ -123,18 +47,40 @@ class Parser {
         return commands;
     }
 
-    static getNextTokenAndUpdateIndex(text, index) {
+    static getRepeatBody(code, index) {
+
+        let startingIndex = index;
+        let openedBracketsCount = 1;
+
+        while (openedBracketsCount > 0) {
+
+            let char = code.charAt(++index);
+
+            if (char === '[') {
+                openedBracketsCount++;
+            } else if (char === ']') {
+                openedBracketsCount--;
+            }
+        }
+
+        return {
+            'body': code.substring(startingIndex + 1, index),
+            'index': index + 1
+        }
+    }
+
+    static getNextTokenAndUpdateIndex(code, index) {
 
         let token = '';
 
-        while (text.charAt(index) === ' ' && index < text.length) {
-            
+        while (code.charAt(index) === ' ' && index < code.length) {
+
             index++;
         }
 
-        while (text.charAt(index) !== ' ' && index < text.length) {
-            
-            token += text.charAt(index);
+        while (code.charAt(index) !== ' ' && index < code.length) {
+
+            token += code.charAt(index);
             index++;
         }
 
@@ -144,17 +90,17 @@ class Parser {
         }
     }
 
-    static format(text) {
+    static format(code) {
 
         let newlineRegex = /\r?\n|\r/g;
         let severalWhitespacesRegex = /\s{2,}/g
 
-        text = text
+        code = code
             .replace(newlineRegex, ' ')
             .replace(severalWhitespacesRegex, ' ')
             .trim();
 
-        return text;
+        return code;
     }
 }
 
