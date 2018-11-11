@@ -5,24 +5,24 @@ class Parser {
 
     static parse(code) {
 
-        let formattedCode = this.format(code);
-
-        let commands = [];
-
-        let index = 0;
+        let formattedCode = this.format(code);    
 
         let digitRegex = /\d+/;
 
         let res;
+        let commandName;
+        let commandArgs;
+        let commandList = [];
+        let index = 0;
 
         while (index < formattedCode.length) {
 
             res = this.getNextTokenAndUpdateIndex(formattedCode, index);
 
-            let commandName = res.token;
+            commandName = res.token;
             index = res.index;
 
-            let commandArgs = [];
+            commandArgs = [];
 
             while (digitRegex.test((res = this.getNextTokenAndUpdateIndex(formattedCode, index)).token)) {
 
@@ -33,18 +33,16 @@ class Parser {
             if (commandName === 'repeat') {
 
                 res = this.getRepeatBody(formattedCode, ++index);
-
                 let parsedBody = this.parse(res.body);
+                index = res.index;
                 
                 commandArgs.push(parsedBody);
-
-                index = res.index;
             }
 
-            commands.push(new Command(commandName, commandArgs));
+            commandList.push(new Command(commandName, commandArgs));
         }
 
-        return commands;
+        return commandList;
     }
 
     static getRepeatBody(code, index) {
