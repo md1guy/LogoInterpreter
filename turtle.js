@@ -10,58 +10,71 @@ class Turtle {
         this.penDown = true;
 
         this.commands = {
+
             'fd': commandArgs => {
 
                 this.move(commandArgs[0]);
             },
+
             'bk': commandArgs => {
 
                 this.move(-commandArgs[0]);
             },
+
             'rt': commandArgs => {
 
-                this.dir += Number(commandArgs[0]);
+                this.dir += +(commandArgs[0]);
             },
+
             'lt': commandArgs => {
 
-                this.dir -= Number(commandArgs[0]);
+                this.dir -= +(commandArgs[0]);
             },
+
             'cs': _ => {
 
                 console.error('cs: not yet implemented');
             },
+
             'pu': _ => {
 
                 this.penDown = false;
             },
+
             'pd': _ => {
 
                 this.penDown = true;
             },
+
             'ht': _ => {
 
                 console.error('ht: not yet implemented');
             },
+
             'st': _ => {
 
                 console.error('st: not yet implemented');
             },
+
             'home': _ => {
                 
-                this.commands.setxy(0, 0);
+                this.commands.setxy([0, 0]);
             },
+
             'label': _ => {
 
                 console.error('label: not yet implemented');
             },
+
             'setxy': commandArgs => {
 
-                this.x = commandArgs[0];
-                this.y = commandArgs[1];
+                this.x = +(commandArgs[0]);
+                this.y = +(commandArgs[1]);
             },
+            
             'repeat': commandArgs => {
 
-                for (let i = 0; i < commandArgs[0]; i++) {
+                for (let i = 0; i < +(commandArgs[0]); i++) {
                     this.execute(commandArgs[1]);
                 }
             }
