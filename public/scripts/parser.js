@@ -1,6 +1,7 @@
 let Command = require("./command.js")
 const util = require('util');
 
+
 class Parser {
 
     static parse(code) {
