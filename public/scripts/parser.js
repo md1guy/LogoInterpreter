@@ -1,12 +1,8 @@
-let Command = require("./command.js")
-const util = require('util');
-
-
 class Parser {
 
     static parse(code) {
 
-        let formattedCode = this.format(code);    
+        let formattedCode = this.format(code);
 
         let digitRegex = /\d+/;
 
@@ -27,17 +23,25 @@ class Parser {
 
             while (digitRegex.test((res = this.getNextTokenAndUpdateIndex(formattedCode, index)).token)) {
 
-                commandArgs.push(res.token);
+                commandArgs.push(+res.token);
                 index = res.index;
             }
 
             if (commandName === 'repeat') {
 
                 res = this.getRepeatBody(formattedCode, ++index);
-                let parsedBody = this.parse(res.body);
-                index = res.index;
-                
-                commandArgs.push(parsedBody);
+
+                if (res.body === '') {
+
+                    console.error('Repeat must have a parameter and properly closed brackets.');
+                    return `Parsing error on index ${++index}: bracket is not closed`;
+                } else {
+
+                    let parsedBody = this.parse(res.body);
+                    index = res.index;
+
+                    commandArgs.push(parsedBody);
+                }
             }
 
             commandList.push(new Command(commandName, commandArgs));
@@ -60,11 +64,19 @@ class Parser {
             } else if (char === ']') {
                 openedBracketsCount--;
             }
+
+            if (index >= code.length) {
+
+                return {
+                    body: '',
+                    index: index - 1,
+                };
+            }
         }
 
         return {
             'body': code.substring(startingIndex + 1, index),
-            'index': index + 1
+            'index': index + 1,
         }
     }
 
@@ -85,14 +97,14 @@ class Parser {
 
         return {
             'token': token,
-            'index': index
+            'index': index,
         }
     }
 
     static format(code) {
 
         let newlineRegex = /\r?\n|\r/g;
-        let severalWhitespacesRegex = /\s{2,}/g
+        let severalWhitespacesRegex = /\s{2,}/g;
 
         code = code
             .replace(newlineRegex, ' ')
@@ -100,6 +112,41 @@ class Parser {
             .trim();
 
         return code;
+    }
+
+    static testCommand(command, args, expectedArgsLength, expectedTypes = []) {
+
+        if (args.length !== expectedTypes.length) {
+
+            console.error(`${command}: expectedTypes.length expected to be ${args.length}, but was ${expectedTypes.length}`);
+            return false;
+        }
+
+        if (args.length !== expectedArgsLength) {
+
+            console.error(`${command}: Wrong number of arguments, expected: ${expectedArgsLength}, was: ${args.length}`);
+            return false;
+        }
+
+        args.forEach((element, index) => {
+
+            if (expectedTypes[index] === "[object Array]") {
+
+                let arrType = Object.prototype.toString.call(element);
+
+                if (expectedTypes[index] !== arrType) {
+
+                    console.error(`${command}: Wrong type of argument ${index}, expected: "expectedTypes[index]", was: ${arrType}`);
+                    return false;
+                }
+            } else if (typeof (element) !== expectedTypes[index]) {
+
+                console.error(`${command}: Wrong type of argument ${index}, expected: ${expectedTypes[index]}, was: ${typeof(element)}`);
+                return false;
+            }
+        });
+
+        return true;
     }
 }
 
